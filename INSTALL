@@ -1,0 +1,5 @@
+Building Filbit
+
+See doc/build-*.md for instructions on building filbitd,
+the intended-for-services, no-graphical-interface, reference
+implementation of Filbit.

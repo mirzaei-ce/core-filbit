@@ -1,0 +1,22 @@
+[Unit]
+Description=Filbit's distributed currency daemon
+After=network.target
+
+[Service]
+User=filbit
+Group=filbit
+
+Type=forking
+PIDFile=/var/lib/filbitd/filbitd.pid
+ExecStart=/usr/bin/filbitd -daemon -pid=/var/lib/filbitd/filbitd.pid \
+-conf=/etc/filbit/filbit.conf -datadir=/var/lib/filbitd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

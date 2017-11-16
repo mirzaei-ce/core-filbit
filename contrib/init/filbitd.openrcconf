@@ -1,0 +1,33 @@
+# /etc/conf.d/filbitd: config file for /etc/init.d/filbitd
+
+# Config file location
+#FILBITD_CONFIGFILE="/etc/filbit/filbit.conf"
+
+# What directory to write pidfile to?  (created and owned by $FILBITD_USER)
+#FILBITD_PIDDIR="/var/run/filbitd"
+
+# What filename to give the pidfile
+#FILBITD_PIDFILE="${FILBITD_PIDDIR}/filbitd.pid"
+
+# Where to write filbitd data (be mindful that the blockchain is large)
+#FILBITD_DATADIR="/var/lib/filbitd"
+
+# User and group to own filbitd process
+#FILBITD_USER="filbit"
+#FILBITD_GROUP="filbit"
+
+# Path to filbitd executable
+#FILBITD_BIN="/usr/bin/filbitd"
+
+# Nice value to run filbitd under
+#FILBITD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+FILBITD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for filbitd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+FILBITD_SIGTERM_TIMEOUT=60

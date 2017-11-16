@@ -1,0 +1,92 @@
+#!/sbin/runscript
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/filbit/.filbit" ]; then
+	FILBITD_DEFAULT_DATADIR="/var/lib/filbit/.filbit"
+else
+	FILBITD_DEFAULT_DATADIR="/var/lib/filbitd"
+fi
+
+FILBITD_CONFIGFILE=${FILBITD_CONFIGFILE:-/etc/filbit/filbit.conf}
+FILBITD_PIDDIR=${FILBITD_PIDDIR:-/var/run/filbitd}
+FILBITD_PIDFILE=${FILBITD_PIDFILE:-${FILBITD_PIDDIR}/filbitd.pid}
+FILBITD_DATADIR=${FILBITD_DATADIR:-${FILBITD_DEFAULT_DATADIR}}
+FILBITD_USER=${FILBITD_USER:-${FILBIT_USER:-filbit}}
+FILBITD_GROUP=${FILBITD_GROUP:-filbit}
+FILBITD_BIN=${FILBITD_BIN:-/usr/bin/filbitd}
+FILBITD_NICE=${FILBITD_NICE:-${NICELEVEL:-0}}
+FILBITD_OPTS="${FILBITD_OPTS:-${FILBIT_OPTS}}"
+
+name="Filbit Core Daemon"
+description="Filbit cryptocurrency P2P network daemon"
+
+command="/usr/bin/filbitd"
+command_args="-pid=\"${FILBITD_PIDFILE}\" \
+		-conf=\"${FILBITD_CONFIGFILE}\" \
+		-datadir=\"${FILBITD_DATADIR}\" \
+		-daemon \
+		${FILBITD_OPTS}"
+
+required_files="${FILBITD_CONFIGFILE}"
+start_stop_daemon_args="-u ${FILBITD_USER} \
+			-N ${FILBITD_NICE} -w 2000"
+pidfile="${FILBITD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${FILBITD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${FILBITD_USER}:${FILBITD_GROUP}" \
+	"${FILBITD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${FILBITD_USER}:${FILBITD_GROUP}" \
+	"${FILBITD_PIDDIR}"
+
+	checkpath -f \
+	-o ${FILBITD_USER}:${FILBITD_GROUP} \
+	-m 0660 \
+	${FILBITD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${FILBITD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run filbitd."
+		eerror "The setting must appear in ${FILBITD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following"
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is also recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"Filbit Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Filbit
+Comment=Filbit P2P Cryptocurrency
+Comment[fr]=Filbit, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Filbit, eşten eşe kriptografik sanal para birimi
+Exec=filbit-qt %u
+Terminal=false
+Type=Application
+Icon=filbit128
+MimeType=x-scheme-handler/filbit;
+Categories=Office;Finance;

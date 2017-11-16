@@ -1,0 +1,7 @@
+[main]
+host = https://www.transifex.com
+
+[filbit.qt-translation-012x]
+file_filter = src/qt/locale/filbit_<lang>.ts
+source_file = src/qt/locale/filbit_en.ts
+source_lang = en
